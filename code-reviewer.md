@@ -89,20 +89,22 @@ When reviewing Rust code, apply these language-specific guidelines:
 - Group imports by source: `std`, external crates, then local modules
 - Use explicit imports rather than glob imports (avoid `use foo::*`)
 - Organize external crate imports alphabetically
+- Use `use super::` for parent module imports between `std` and external crates
 - Place local module imports (`use crate::`) at the bottom of imports
 - Separate import groups with blank lines
 
 Example:
 ```rust
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::time::Duration;
 
 use alloy_primitives::{Address, U256};
-use anyhow::Result;
+use anyhow::{Context as _, Result}; // Rename to avoid conflicts
 use serde::{Deserialize, Serialize};
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::{
-    actions::Action,
+    actions::{Action, ActionType}, // Selective imports
     errors::{VAppError, VAppPanic},
     events::VAppEvent,
 };
@@ -114,6 +116,8 @@ use crate::{
 - Include examples in documentation when helpful
 - Use square brackets for parameter references in docs: `[VAppEvent]`, `[State]`
 - Document error conditions and panics
+- Use `# Examples`, `# Errors`, `# Panics` sections in doc comments
+- Link to related types and methods using intra-doc links
 
 ### Comments and Code Style
 In this codebase, comments are always written in full sentences with periods.
@@ -241,6 +245,10 @@ Example:
 ```rust
 info!("STEP {}: DEPOSIT({:?})", self.tx, deposit);
 info!("Account({}): + {} $PROVE", account, amount);
+
+// Structured logging with key-value pairs
+info!(tx = %pos, action = ?action, "transaction processed with action");
+warn!(tx = %pos, error = ?revert, "transaction reverted");
 ```
 
 ### Database Queries
@@ -248,12 +256,16 @@ info!("Account({}): + {} $PROVE", account, amount);
 - Include comments in SQL to explain complex joins
 - Use bind parameters (`$1`, `$2`) for all dynamic values
 - Structure complex queries with clear section headers
+- Handle database errors with appropriate context using `.map_err()` or custom error variants
+- Use transactions for operations that modify multiple tables
 
 ### Async/Await Patterns
 - Use `tokio::spawn` for concurrent operations
 - Prefer `join_all` over sequential awaits when operations can run in parallel
 - Use `try_join!` macro for operations that can fail
 - Handle `JoinError` appropriately
+- Use `tokio::time::timeout` for operations that might hang
+- Implement graceful shutdown with cancellation tokens
 
 ### Generic Constraints
 - Use meaningful trait bounds: `T: Provider`, `V: VAppVerifier`
@@ -262,7 +274,7 @@ info!("Account({}): + {} $PROVE", account, amount);
 
 ### Constants and Static Values
 - Use `SCREAMING_SNAKE_CASE` for constants
-- Use `Lazy<T>` for expensive static computations
+- Use `std::sync::LazyLock<T>` for expensive static computations (prefer over `lazy_static`)
 - Place constants at module level, not embedded in functions
 
 ### Pattern Matching
@@ -277,6 +289,8 @@ info!("Account({}): + {} $PROVE", account, amount);
 - Use `assert_eq!` with descriptive failure messages
 - Test both success and failure cases
 - Use `setup()` functions for common test initialization
+- Use `#[tokio::test]` for async tests
+- Consider using `tokio-test` crate for advanced async testing utilities
 
 ### Comments and Code Organization
 - Avoid obvious comments; focus on explaining "why" not "what"
