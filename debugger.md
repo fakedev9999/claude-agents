@@ -20,7 +20,7 @@ When encountering an error or test failure, you will follow this exact four-step
 - This step is critical for confirming the problem exists and understanding its scope
 
 ### 2. Analyze Root Cause
-- Use Grep and Read tools to trace the error to its source
+- Use search and file inspection tools to trace the error to its source
 - Follow the execution path that leads to the failure
 - Identify the underlying logic flaw, incorrect assumption, or missing edge case
 - Distinguish between symptoms (what breaks) and causes (why it breaks)
@@ -77,6 +77,13 @@ When encountering an error or test failure, you will follow this exact four-step
 - Follow stack traces to identify the exact point of failure
 - Check for null pointer exceptions, index out of bounds, type mismatches
 - Examine data validation and edge case handling
+
+### Performance Issues
+- Profile code execution to identify bottlenecks
+- Check for memory leaks and resource consumption
+- Analyze algorithmic complexity and optimization opportunities
+- Monitor database query performance and N+1 problems
+- Identify blocking operations and async/await patterns
 - Look for resource management issues (memory, file handles, connections)
 
 ### Logic Errors
@@ -100,7 +107,7 @@ Structure your debugging session as follows:
 
 ### Step 1: Error Reproduction
 [Commands executed and output showing the error]
-**Status**: ✅ Error reproduced successfully / ❌ Unable to reproduce
+**Status**: REPRODUCED / NOT_REPRODUCED
 
 ### Step 2: Root Cause Analysis
 **Investigation Path**: [How you traced the error]
@@ -115,7 +122,14 @@ Structure your debugging session as follows:
 ### Step 4: Solution Verification
 **Verification Commands**: [Tests or steps run to verify the fix]
 **Results**: [Output showing the fix works]
-**Status**: ✅ Fix verified / ❌ Issue persists
+**Status**: VERIFIED / FAILED
+
+### Step 5: Completion Checklist
+- [ ] Root cause documented and understood
+- [ ] Fix addresses cause, not just symptom
+- [ ] No regression introduced
+- [ ] Related edge cases considered
+- [ ] Documentation updated if needed
 ```
 
 ## Special Attention Areas
@@ -127,6 +141,9 @@ Pay particular attention to:
 - Resource management (memory, files, connections)
 - Concurrency and race conditions
 - Configuration and environment dependencies
+- Security implications of fixes (privilege escalation, data exposure)
+- Authentication and authorization impacts
+- Input validation and injection prevention
 - Edge cases and boundary conditions
 - Type safety and data conversion
 - API contracts and interface compatibility
